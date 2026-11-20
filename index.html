@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DOMERA — بداية مشروعك</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#23211F;--paper:#F6F3EE;--line:#E6E0D7;--bronze:#A68A64;--bronze-d:#8C7250;--muted:#7B746A;--cream:#F4F1EC;
+ --fd:"Cormorant Garamond","Times New Roman",serif;--fb:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--fb);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.hero{background:var(--ink);color:var(--cream);padding:44px 22px 36px;text-align:center}
+.hero .word{font-family:var(--fd);font-size:34px;letter-spacing:.34em;direction:ltr;margin-inline-start:.34em}
+.hero .tag{font-size:10.5px;letter-spacing:.28em;color:#B8AE9F;direction:ltr;margin-top:2px}
+.hero h1{font-weight:500;font-size:22px;margin:26px 0 6px}.hero p{color:#CFC6B8;margin:0 auto;max-width:440px;font-size:14px}
+.prog{position:sticky;top:0;z-index:5;height:3px;background:#E8E1D6}.prog i{display:block;height:100%;width:0;background:var(--bronze);transition:width .3s}
+main{max-width:640px;margin:0 auto;padding:18px 16px 120px}
+.sec{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 16px;margin-top:14px}
+.sec h2{font-size:16px;font-weight:600;margin:0 0 2px;display:flex;align-items:center;gap:10px}.sec h2 em{font-style:normal;font-family:var(--fd);color:var(--bronze);font-size:22px}
+.sec .hint{color:var(--muted);font-size:12.5px;margin:0 0 12px}
+.f{display:flex;flex-direction:column;gap:5px;margin-top:12px}.f label{font-size:13px;color:#3A3733;font-weight:500}
+.f input,.f select,.f textarea{font:inherit;font-size:15px;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:#FCFBF9;color:var(--ink);width:100%}
+.f input:focus,.f select:focus,.f textarea:focus{outline:2px solid #D9C8AE;border-color:var(--bronze);background:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.opt{position:relative}.opt input{position:absolute;opacity:0;inset:0}
+.opt span{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13.5px;background:#FCFBF9;cursor:pointer;transition:.15s}
+.opt input:checked+span{background:var(--ink);color:#fff;border-color:var(--ink)}.opt input:focus-visible+span{outline:2px solid var(--bronze)}
+.cards{display:grid;grid-template-columns:1fr;gap:10px;margin-top:8px}
+.card{position:relative;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px 13px 40px;cursor:pointer;background:#FCFBF9;display:block}
+.card input{position:absolute;left:14px;top:16px;accent-color:var(--ink)}.card b{display:block;font-size:14.5px}.card small{color:var(--muted);font-size:12.5px}
+.card:has(input:checked){border-color:var(--bronze);background:#FAF6EF}
+.styles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+.sty{position:relative;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;background:#fff}
+.sty input{position:absolute;opacity:0}.sty .sw{height:64px;display:flex}.sty .sw i{flex:1}.sty div.t{padding:8px 10px;font-size:13px}.sty div.t small{display:block;color:var(--muted);font-size:11.5px}
+.sty:has(input:checked){border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.rooms{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;margin-top:8px}
+.ctr{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden}.ctr button{border:0;background:#F2EEE7;width:36px;height:36px;font-size:18px;cursor:pointer;color:var(--ink)}.ctr output{width:34px;text-align:center;font-variant-numeric:tabular-nums}
+.bar{position:fixed;bottom:0;left:0;right:0;background:rgba(246,243,238,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.bar .in{max-width:640px;margin:0 auto;display:flex;gap:10px}
+.btn{flex:1;font:inherit;font-weight:600;font-size:15px;border:0;border-radius:12px;padding:14px;cursor:pointer;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.wa{background:#1F7A4D}.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);flex:0 0 auto;padding:14px 16px}
+.err{color:#A4473A;font-size:12.5px;display:none}.bad .err{display:block}.bad input{border-color:#A4473A}
+.done{display:none;text-align:center;padding:40px 10px}.done h2{font-family:var(--fd);font-size:30px;font-weight:500;margin:0}.done p{color:var(--muted)}
+.foot{text-align:center;color:var(--muted);font-size:11.5px;margin-top:22px;letter-spacing:.06em}
+@media (min-width:560px){.cards{grid-template-columns:1fr 1fr}.styles{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="word">DOMERA</div><div class="tag">INTERIORS · TURNKEY FINISHING</div>
+  <h1>خلّينا نبدأ مشروعك</h1>
+  <p>دقيقتين بس — البيانات دي بتساعدنا نجهّزلك عرض مناسب لوحدتك وطريقة حياتك وميزانيتك.</p>
+</header>
+<div class="prog"><i id="pg"></i></div>
+<main id="main">
+ <form id="fm" novalidate>
+  <section class="sec"><h2><em>01</em> بياناتك</h2>
+   <div class="f" id="w_name"><label for="name">الاسم</label><input id="name" autocomplete="name" required><span class="err">اكتب الاسم</span></div>
+   <div class="f" id="w_phone"><label for="phone">رقم الموبايل (واتساب)</label><input id="phone" inputmode="tel" dir="ltr" autocomplete="tel" placeholder="01xxxxxxxxx" required><span class="err">اكتب رقم صحيح</span></div>
+  </section>
+
+  <section class="sec"><h2><em>02</em> الخدمة اللي محتاجها</h2><p class="hint">اختار واحدة أو أكتر — ولو مش متأكد اختار «محتاج استشارة».</p>
+   <div class="cards">
+    <label class="card"><input type="checkbox" name="svc" value="design"><b>تصميم ومستندات</b><small>رفع مقاسات، تصميم 3D، رسومات تنفيذية وشوب دروينج ومقايسة — وانت تنفّذ بمعرفتك</small></label>
+    <label class="card"><input type="checkbox" name="svc" value="turnkey"><b>تسليم على المفتاح</b><small>سعر ثابت شامل الخامات والمصنعيات والإشراف</small></label>
+    <label class="card"><input type="checkbox" name="svc" value="cost"><b>إدارة التنفيذ بنسبة</b><small>إحنا ننفّذ بالتكلفة الفعلية بالفواتير + نسبة أتعاب</small></label>
+    <label class="card"><input type="checkbox" name="svc" value="fixed"><b>إشراف هندسي</b><small>مهندس بيتابع المقاول بتاعك بزيارات أسبوعية ومبلغ ثابت</small></label>
+    <label class="card"><input type="checkbox" name="svc" value="unsure"><b>محتاج استشارة</b><small>نتكلم ونرشّحلك الأنسب</small></label>
+   </div>
+  </section>
+
+  <section class="sec"><h2><em>03</em> الوحدة</h2>
+   <div class="f"><label>نوعها</label><div class="opts">${R("unit",["شقة","دوبلكس","تاون هاوس","توين هاوس","فيلا مستقلة","مكتب / تجاري"])}</div></div>
+   <div class="f"><label for="location">المكان / الكمبوند</label><input id="location" placeholder="مثلًا: بالم هيلز — 6 أكتوبر"></div>
+   <div class="row"><div class="f"><label for="area">المساحة الإجمالية (م²)</label><input id="area" inputmode="decimal" placeholder="250"></div>
+     <div class="f"><label for="floors">عدد الأدوار</label><select id="floors"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4+</option></select></div></div>
+   <div class="f"><label>حالتها دلوقتي</label><div class="opts">${R("state",["طوب أحمر","محارة","نص تشطيب","متشطبة ومحتاجة تجديد"])}</div></div>
+  </section>
+
+  <section class="sec"><h2><em>04</em> البيت من جوه</h2><p class="hint">العدد التقريبي للفراغات اللي محتاجة شغل.</p>
+   <div class="rooms" id="rooms"></div>
+   <div class="f"><label for="family">عدد أفراد الأسرة</label><input id="family" inputmode="numeric" placeholder="مثلًا 4"></div>
+  </section>
+
+  <section class="sec"><h2><em>05</em> الستايل اللي بتحبه</h2><p class="hint">اختار اللي أقرب لذوقك (ممكن أكتر من واحد).</p>
+   <div class="styles" id="styles"></div>
+   <div class="f"><label for="ref">لو عندك صور أو حسابات بتحبها (إنستجرام / بنترست) اكتبها</label><input id="ref" placeholder="اختياري"></div>
+  </section>
+
+  <section class="sec"><h2><em>06</em> الميزانية والوقت</h2>
+   <div class="f"><label>الميزانية التقريبية للتشطيب</label><div class="opts">${R("budget",["أقل من 1 مليون","1 – 2 مليون","2 – 4 مليون","4 – 7 مليون","أكتر من 7 مليون","لسه مش محددة"])}</div></div>
+   <div class="f"><label>عايز تستلم إمتى؟</label><div class="opts">${R("deadline",["في أسرع وقت","خلال 3 – 6 شهور","خلال 6 – 12 شهر","مش مستعجل"])}</div></div>
+   <div class="f"><label for="notes">أي حاجة تحب تقولهالنا</label><textarea id="notes" rows="3" placeholder="أولويات، حاجات مش عايزها، تفاصيل مهمة ليك…"></textarea></div>
+  </section>
+ </form>
+ <div class="done" id="done"><h2>طلبك جاهز</h2><p>اضغط الزرار عشان يفتح واتساب والرسالة مكتوبة — اختار محادثتنا واضغط إرسال.</p>
+  <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener" style="margin:18px 0 10px">افتح واتساب وابعت الطلب</a>
+  <p class="hint">لو واتساب مافتحش: انسخ الرسالة وابعتها لنا في أي محادثة.</p>
+  <textarea id="msg" readonly rows="7" style="width:100%;font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;direction:rtl"></textarea>
+  <button class="btn ghost" id="copy2" type="button" style="width:100%;margin-top:8px">انسخ الرسالة</button>
+  <p class="hint" style="margin-top:16px">شكرًا ليك — هنتواصل معاك في أقرب وقت.</p></div>
+ <div class="foot">DOMERA · Italian Contemporary Luxury</div>
+</main>
+<div class="bar"><div class="in"><button class="btn wa" id="send">جهّز الطلب وابعته على واتساب</button><button class="btn ghost" id="copy" title="انسخ الطلب">انسخ</button></div></div>
+<script>
+"use strict";
+/* رقم الشركة اللي الطلب بيتبعتله — اتركه فاضي عشان العميل يختار المحادثة */
+const COMPANY_WA=(new URLSearchParams(location.search).get("to")||"").replace(/\D/g,"");
+function R(n,a){return a.map(v=>`<label class="opt"><input type="radio" name="${n}" value="${v}"><span>${v}</span></label>`).join("");}
+document.querySelectorAll(".opts").forEach(el=>{el.innerHTML=el.innerHTML.replace(/\$\{R\("(\w+)",\[(.*?)\]\)\}/g,(m,n,arr)=>R(n,JSON.parse("["+arr+"]")));});
+const ROOMS=[["reception","ريسبشن / ليفنج",1],["bed","غرف نوم",3],["master","غرفة ماستر بدريسنج",1],["bath","حمامات",3],["kitchen","مطبخ",1],["office","مكتب / غرفة مذاكرة",0],["nanny","غرفة مربية / خدمة",0],["roof","روف / تراس",0],["garden","جنينة",0]];
+document.getElementById("rooms").innerHTML=ROOMS.map(([k,n,v])=>`<span>${n}</span><div class="ctr"><button type="button" data-d="-1" data-k="${k}" aria-label="أقل">−</button><output id="r_${k}">${v}</output><button type="button" data-d="1" data-k="${k}" aria-label="أكتر">+</button></div>`).join("");
+document.getElementById("rooms").onclick=e=>{const b=e.target.closest("button");if(!b)return;const o=document.getElementById("r_"+b.dataset.k);o.value=o.textContent=Math.max(0,Math.min(20,(+o.textContent)+(+b.dataset.d)));upd();};
+const STY=[["إيطالي معاصر",["#2B2724","#B9A68A","#EFE9E0","#7D6B57"]],["مودرن",["#1E1E1E","#F2F2F0","#9EA3A6","#D9D4CC"]],["نيو كلاسيك",["#F3EEE6","#C9B48C","#FFFFFF","#8E7A5B"]],["مينيمال",["#FAFAF8","#E3DFD8","#BDB6AB","#2D2D2D"]],["وارم / ناتشورال",["#D9C3A5","#8A6A4A","#F1E8DB","#5C6B4F"]],["كلاسيك",["#5B3A29","#C7A36A","#EADBC3","#2A1D16"]]];
+document.getElementById("styles").innerHTML=STY.map(([n,c])=>`<label class="sty"><input type="checkbox" name="style" value="${n}"><div class="sw">${c.map(x=>`<i style="background:${x}"></i>`).join("")}</div><div class="t">${n}</div></label>`).join("");
+const $=id=>document.getElementById(id), v=id=>($(id).value||"").trim(), rv=n=>(document.querySelector(`input[name=${n}]:checked`)||{}).value||"", cv=n=>[...document.querySelectorAll(`input[name=${n}]:checked`)].map(x=>x.value);
+function data(){ const r={}; ROOMS.forEach(([k])=>r[k]=+$("r_"+k).textContent);
+  return {ref:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:v("name"),phone:v("phone"),services:cv("svc"),unit:rv("unit"),location:v("location"),area:v("area"),floors:v("floors"),state:rv("state"),
+    rooms:String(r.bed+r.master),baths:String(r.bath),family:v("family"),style:cv("style").join("، "),budget:rv("budget"),deadline:rv("deadline"),notes:[v("notes"),v("ref")&&("مراجع: "+v("ref"))].filter(Boolean).join("\n"),
+    rooms_list:ROOMS.filter(([k])=>r[k]).map(([k,n])=>`${n}: ${r[k]}`).join(" — ")}; }
+const SV={design:"تصميم ومستندات",turnkey:"تسليم على المفتاح",cost:"إدارة التنفيذ بنسبة",fixed:"إشراف هندسي",unsure:"محتاج استشارة"};
+function message(d){ const code=btoa(unescape(encodeURIComponent(JSON.stringify(d)))).replace(/\+/g,"-").replace(/\//g,"_");
+  const L=[`*طلب مشروع جديد — DOMERA*`," ",`👤 ${d.name} — ${d.phone}`,`🛠 ${d.services.map(s=>SV[s]).join("، ")||"—"}`,`🏠 ${[d.unit,d.area&&d.area+" م²",d.floors&&d.floors+" أدوار",d.location].filter(Boolean).join(" · ")||"—"}`,
+    d.state&&`🧱 الحالة: ${d.state}`,d.rooms_list&&`🛋 ${d.rooms_list}`,d.style&&`🎨 ${d.style}`,d.budget&&`💰 ${d.budget}`,d.deadline&&`⏱ ${d.deadline}`,d.notes&&`📝 ${d.notes}`," ",`(كود الطلب — من فضلك متغيّروش)`,`DMR1:${code}`];
+  return L.filter(Boolean).map(x=>x===" "?"":x).join("\n"); }
+function check(){ let ok=true; [["name",x=>x.length>1],["phone",x=>x.replace(/\D/g,"").length>=10]].forEach(([id,f])=>{const w=$("w_"+id),g=f(v(id)); w.classList.toggle("bad",!g); if(!g&&ok){ok=false;$(id).focus();}}); return ok; }
+function upd(){ const d=data(); const n=[d.name,d.phone,d.services.length,d.unit,d.area,d.state,d.style,d.budget,d.deadline].filter(Boolean).length; $("pg").style.width=Math.round(n/9*100)+"%"; }
+document.addEventListener("input",upd); document.addEventListener("change",upd); upd();
+$("send").onclick=()=>{ if(!check()) return; const t=message(data()); const url=`https://wa.me/${COMPANY_WA}?text=${encodeURIComponent(t)}`;
+  $("wa").href=url; $("msg").value=t; $("fm").style.display="none"; $("done").style.display="block"; document.querySelector(".bar").style.display="none"; window.scrollTo(0,0); };
+const doCopy=async(btn)=>{ const t=$("msg").value||message(data()); try{ await navigator.clipboard.writeText(t); btn.textContent="اتنسخ ✓"; }catch(_){ $("msg").select(); try{document.execCommand("copy");btn.textContent="اتنسخ ✓";}catch(e){ btn.textContent="اضغط مطوّل على الرسالة وانسخها"; } } };
+$("copy").onclick=()=>{ if(!check()) return; $("msg").value=message(data()); doCopy($("copy")); };
+$("copy2").onclick=()=>doCopy($("copy2"));
+</script>
+</body>
+</html>
