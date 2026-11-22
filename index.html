@@ -81,10 +81,10 @@ main{max-width:640px;margin:0 auto;padding:18px 16px 120px}
    <div class="f"><label>حالتها دلوقتي</label><div class="opts">${R("state",["طوب أحمر","محارة","نص تشطيب","متشطبة ومحتاجة تجديد"])}</div></div>
   </section>
 
-  <section class="sec"><h2><em>04</em> البيت من جوه</h2><p class="hint">العدد التقريبي للفراغات اللي محتاجة شغل.</p>
+  <section class="sec"><details><summary>تفاصيل الأماكن (اختياري)</summary><p class="hint">العدد التقريبي للفراغات اللي محتاجة شغل.</p>
    <div class="rooms" id="rooms"></div>
    <div class="f"><label for="family">عدد أفراد الأسرة</label><input id="family" inputmode="numeric" placeholder="مثلًا 4"></div>
-  </section>
+  </details></section>
 
   <section class="sec"><h2><em>05</em> الستايل اللي بتحبه</h2><p class="hint">اختار اللي أقرب لذوقك (ممكن أكتر من واحد).</p>
    <div class="styles" id="styles"></div>
@@ -94,7 +94,9 @@ main{max-width:640px;margin:0 auto;padding:18px 16px 120px}
   <section class="sec"><h2><em>06</em> الميزانية والوقت</h2>
    <div class="f"><label>الميزانية التقريبية للتشطيب</label><div class="opts">${R("budget",["أقل من 1 مليون","1 – 2 مليون","2 – 4 مليون","4 – 7 مليون","أكتر من 7 مليون","لسه مش محددة"])}</div></div>
    <div class="f"><label>عايز تستلم إمتى؟</label><div class="opts">${R("deadline",["في أسرع وقت","خلال 3 – 6 شهور","خلال 6 – 12 شهر","مش مستعجل"])}</div></div>
-   <div class="f"><label for="notes">أي حاجة تحب تقولهالنا</label><textarea id="notes" rows="3" placeholder="أولويات، حاجات مش عايزها، تفاصيل مهمة ليك…"></textarea></div>
+   <div class="f"><label for="scope">إيه اللي تحب تغيّره، وإيه اللي عايز تحتفظ بيه؟</label><input id="scope" placeholder="مثلاً نغيّر المطبخ ونسيب الأرضيات"></div>
+   <div class="f"><label>إيه أهم حاجة عندك؟</label><div class="opts">${R("priority",["الميزانية","سرعة التسليم","المتانة","الشكل","استمرار استخدام المكان"])}</div></div>
+   <div class="f"><label for="notes">تفاصيل إضافية (اختياري)</label><textarea id="notes" rows="3" placeholder="أولويات، حاجات مش عايزها، تفاصيل مهمة ليك…"></textarea></div>
   </section>
  </form>
  <div class="done" id="done"><h2>طلبك جاهز</h2><p>اضغط الزرار عشان يفتح واتساب والرسالة مكتوبة — اختار محادثتنا واضغط إرسال.</p>
@@ -113,21 +115,23 @@ const COMPANY_WA=(new URLSearchParams(location.search).get("to")||"").replace(/\
 function R(n,a){return a.map(v=>`<label class="opt"><input type="radio" name="${n}" value="${v}"><span>${v}</span></label>`).join("");}
 document.querySelectorAll(".opts").forEach(el=>{el.innerHTML=el.innerHTML.replace(/\$\{R\("(\w+)",\[(.*?)\]\)\}/g,(m,n,arr)=>R(n,JSON.parse("["+arr+"]")));});
 const ROOMS=[["reception","ريسبشن / ليفنج",1],["bed","غرف نوم",3],["master","غرفة ماستر بدريسنج",1],["bath","حمامات",3],["kitchen","مطبخ",1],["office","مكتب / غرفة مذاكرة",0],["nanny","غرفة مربية / خدمة",0],["roof","روف / تراس",0],["garden","جنينة",0]];
-document.getElementById("rooms").innerHTML=ROOMS.map(([k,n,v])=>`<span>${n}</span><div class="ctr"><button type="button" data-d="-1" data-k="${k}" aria-label="أقل">−</button><output id="r_${k}">${v}</output><button type="button" data-d="1" data-k="${k}" aria-label="أكتر">+</button></div>`).join("");
-document.getElementById("rooms").onclick=e=>{const b=e.target.closest("button");if(!b)return;const o=document.getElementById("r_"+b.dataset.k);o.value=o.textContent=Math.max(0,Math.min(20,(+o.textContent)+(+b.dataset.d)));upd();};
+document.getElementById("rooms").innerHTML=ROOMS.map(([k,n,v])=>`<span>${n}</span><div class="ctr"><button type="button" data-d="-1" data-k="${k}" aria-label="أقل">−</button><output id="r_${k}">—</output><button type="button" data-d="1" data-k="${k}" aria-label="أكتر">+</button></div>`).join("");
+document.getElementById("rooms").onclick=e=>{const b=e.target.closest("button");if(!b)return;const o=document.getElementById("r_"+b.dataset.k);o.value=o.textContent=Math.max(0,Math.min(20,(Number(o.textContent)||0)+(+b.dataset.d)));upd();};
 const STY=[["إيطالي معاصر",["#2B2724","#B9A68A","#EFE9E0","#7D6B57"]],["مودرن",["#1E1E1E","#F2F2F0","#9EA3A6","#D9D4CC"]],["نيو كلاسيك",["#F3EEE6","#C9B48C","#FFFFFF","#8E7A5B"]],["مينيمال",["#FAFAF8","#E3DFD8","#BDB6AB","#2D2D2D"]],["وارم / ناتشورال",["#D9C3A5","#8A6A4A","#F1E8DB","#5C6B4F"]],["كلاسيك",["#5B3A29","#C7A36A","#EADBC3","#2A1D16"]]];
 document.getElementById("styles").innerHTML=STY.map(([n,c])=>`<label class="sty"><input type="checkbox" name="style" value="${n}"><div class="sw">${c.map(x=>`<i style="background:${x}"></i>`).join("")}</div><div class="t">${n}</div></label>`).join("");
 const $=id=>document.getElementById(id), v=id=>($(id).value||"").trim(), rv=n=>(document.querySelector(`input[name=${n}]:checked`)||{}).value||"", cv=n=>[...document.querySelectorAll(`input[name=${n}]:checked`)].map(x=>x.value);
-function data(){ const r={}; ROOMS.forEach(([k])=>r[k]=+$("r_"+k).textContent);
-  return {ref:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:v("name"),phone:v("phone"),services:cv("svc"),unit:rv("unit"),location:v("location"),area:v("area"),floors:v("floors"),state:rv("state"),
-    rooms:String(r.bed+r.master),baths:String(r.bath),family:v("family"),style:cv("style").join("، "),budget:rv("budget"),deadline:rv("deadline"),notes:[v("notes"),v("ref")&&("مراجع: "+v("ref"))].filter(Boolean).join("\n"),
+const digits=s=>s.replace(/[٠-٩]/g,c=>"٠١٢٣٤٥٦٧٨٩".indexOf(c)).replace(/[۰-۹]/g,c=>"۰۱۲۳۴۵۶۷۸۹".indexOf(c));
+function data(){ const r={}; ROOMS.forEach(([k])=>r[k]=$("r_"+k).textContent==="—"?null:Number($("r_"+k).textContent));
+  return {name:v("name"),phone:digits(v("phone")),services:cv("svc"),unit:rv("unit"),location:v("location"),area:digits(v("area")).replace("٫","."),floors:v("floors"),state:rv("state"),
+    rooms:r.bed==null&&r.master==null?"":String((r.bed||0)+(r.master||0)),baths:r.bath==null?"":String(r.bath),family:v("family"),style:cv("style").join("، "),budget:rv("budget"),deadline:rv("deadline"),scope:v("scope"),priority:rv("priority"),notes:[v("scope")&&("نطاق الشغل: "+v("scope")),rv("priority")&&("الأولوية: "+rv("priority")),v("notes"),v("ref")&&("مراجع: "+v("ref"))].filter(Boolean).join("\n"),
     rooms_list:ROOMS.filter(([k])=>r[k]).map(([k,n])=>`${n}: ${r[k]}`).join(" — ")}; }
 const SV={design:"تصميم ومستندات",turnkey:"تسليم على المفتاح",cost:"إدارة التنفيذ بنسبة",fixed:"إشراف هندسي",unsure:"محتاج استشارة"};
-function message(d){ const code=btoa(unescape(encodeURIComponent(JSON.stringify(d)))).replace(/\+/g,"-").replace(/\//g,"_");
+let lastAnswers="", lastRef="";
+function message(d){ const answers=JSON.stringify(d); if(answers!==lastAnswers){lastAnswers=answers;lastRef=Date.now().toString(36)+Math.random().toString(36).slice(2,6);} d={...d,ref:lastRef}; const code=btoa(unescape(encodeURIComponent(JSON.stringify(d)))).replace(/\+/g,"-").replace(/\//g,"_");
   const L=[`*طلب مشروع جديد — DOMERA*`," ",`👤 ${d.name} — ${d.phone}`,`🛠 ${d.services.map(s=>SV[s]).join("، ")||"—"}`,`🏠 ${[d.unit,d.area&&d.area+" م²",d.floors&&d.floors+" أدوار",d.location].filter(Boolean).join(" · ")||"—"}`,
     d.state&&`🧱 الحالة: ${d.state}`,d.rooms_list&&`🛋 ${d.rooms_list}`,d.style&&`🎨 ${d.style}`,d.budget&&`💰 ${d.budget}`,d.deadline&&`⏱ ${d.deadline}`,d.notes&&`📝 ${d.notes}`," ",`(كود الطلب — من فضلك متغيّروش)`,`DMR1:${code}`];
   return L.filter(Boolean).map(x=>x===" "?"":x).join("\n"); }
-function check(){ let ok=true; [["name",x=>x.length>1],["phone",x=>x.replace(/\D/g,"").length>=10]].forEach(([id,f])=>{const w=$("w_"+id),g=f(v(id)); w.classList.toggle("bad",!g); if(!g&&ok){ok=false;$(id).focus();}}); return ok; }
+function check(){ let ok=true; [["name",x=>x.length>1],["phone",x=>digits(x).replace(/\D/g,"").length>=10]].forEach(([id,f])=>{const w=$("w_"+id),g=f(v(id)); w.classList.toggle("bad",!g); if(!g&&ok){ok=false;$(id).focus();}}); return ok; }
 function upd(){ const d=data(); const n=[d.name,d.phone,d.services.length,d.unit,d.area,d.state,d.style,d.budget,d.deadline].filter(Boolean).length; $("pg").style.width=Math.round(n/9*100)+"%"; }
 document.addEventListener("input",upd); document.addEventListener("change",upd); upd();
 $("send").onclick=()=>{ if(!check()) return; const t=message(data()); const url=`https://wa.me/${COMPANY_WA}?text=${encodeURIComponent(t)}`;
