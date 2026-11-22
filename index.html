@@ -86,6 +86,7 @@ main{max-width:640px;margin:0 auto;padding:18px 16px 120px}
    <div class="f"><label for="family">عدد أفراد الأسرة</label><input id="family" inputmode="numeric" placeholder="مثلًا 4"></div>
   </details></section>
 
+  <section class="sec"><h2>بنود التشطيب اللي محتاجها</h2><p class="hint">افتح القسم اللي يخصّك. لكل بند اختار مطلوب، مش مطلوب، أو محتاج رأي المهندس. تقدر تسيب أي بند من غير إجابة.</p><div id="finish-groups"></div></section>
   <section class="sec"><h2><em>05</em> الستايل اللي بتحبه</h2><p class="hint">اختار اللي أقرب لذوقك (ممكن أكتر من واحد).</p>
    <div class="styles" id="styles"></div>
    <div class="f"><label for="ref">لو عندك صور أو حسابات بتحبها (إنستجرام / بنترست) اكتبها</label><input id="ref" placeholder="اختياري"></div>
@@ -121,9 +122,51 @@ const STY=[["إيطالي معاصر",["#2B2724","#B9A68A","#EFE9E0","#7D6B57"]]
 document.getElementById("styles").innerHTML=STY.map(([n,c])=>`<label class="sty"><input type="checkbox" name="style" value="${n}"><div class="sw">${c.map(x=>`<i style="background:${x}"></i>`).join("")}</div><div class="t">${n}</div></label>`).join("");
 const $=id=>document.getElementById(id), v=id=>($(id).value||"").trim(), rv=n=>(document.querySelector(`input[name=${n}]:checked`)||{}).value||"", cv=n=>[...document.querySelectorAll(`input[name=${n}]:checked`)].map(x=>x.value);
 const digits=s=>s.replace(/[٠-٩]/g,c=>"٠١٢٣٤٥٦٧٨٩".indexOf(c)).replace(/[۰-۹]/g,c=>"۰۱۲۳۴۵۶۷۸۹".indexOf(c));
+// One entry per decision; alternatives can be combined across rooms.
+const finishGroups=[
+ ["أعمال التجديد والتأسيس",["فك وإزالة|أرضيات|حوائط|أبواب|أطقم صحية","تعديل التقسيم الداخلي|بناء قواطيع|إزالة قواطيع بعد معاينة المهندس","محارة وتسوية|حوائط|أسقف|أرضيات","عزل|حمامات|مطبخ|سطح|تراس|عزل صوتي","نقل رتش وحماية الموجود"]],
+ ["الأرضيات والسلالم",["تشطيب الأرضيات|بورسلين|رخام|سيراميك|جرانيت|باركيه طبيعي|HDF / SPC|ميكروسيمنت|موكيت","وزرات|من نفس الأرضية|خشب|مخفية","تشطيب السلم|رخام|جرانيت|خشب","تجديد الأرضية الموجودة|جلي رخام|صنفرة باركيه|تغيير بلاطات"]],
+ ["الحوائط والأسقف",["دهانات|قابلة للغسيل|مط|ديكورية","تجاليد خشبية|خشب طبيعي|قشرة|بديل خشب","كسوة حوائط|رخام|حجر|بورسلين|ورق حائط|مرايات","أسقف|دهان مباشر|جبس بورد سادة|بيت نور|سقف قابل للفك","بانوهات وكرانيش"]],
+ ["الأبواب والشبابيك والألوميتال",["أبواب داخلية|خشب|زجاج|مقاومة للرطوبة","باب المدخل|مصفح|خشب","شبابيك وأبواب بلكونات|ألوميتال|UPVC|خشب","مواصفات الفتحات|زجاج مزدوج|عازل صوت|سلك ناموس|شيش يدوي|شيش كهرباء","درابزين|زجاج|حديد|ستانلس|خشب"]],
+ ["السباكة والحمامات والمياه الساخنة",["تجديد شبكة التغذية والصرف|كامل|في أماكن محددة","نظام المياه الساخنة|سخان مركزي|سخانات منفصلة عادية|الاحتفاظ بالنظام الحالي","مصدر تسخين المياه|غاز|كهرباء|شمسي","تجهيز الحمامات|أطقم صحية|خلاطات|دش|بانيو|كابينة زجاج|وحدة حوض|سيفون مدفون","تجهيزات المياه|خزان|مضخة|فلتر|نقطة غسالة|نقطة غسالة أطباق"]],
+ ["الكهرباء والإضاءة والتيار الخفيف",["تأسيس كهرباء|لوحة توزيع|برايز إضافية|خطوط للأجهزة","إنارة|سبوتات|مسارات مغناطيسية|شرائط LED|نجف|إضاءة خارجية","شبكات واتصالات|إنترنت سلكي|نقاط واي فاي|تلفزيون|إنتركم","كاميرات وأنظمة أمان|كاميرات|إنذار|حساسات دخان"]],
+ ["السمارت هوم",["نظام Smart Home|تأسيس للمستقبل فقط|توريد وتركيب وتشغيل","الوظائف الذكية|إنارة|ستائر وشيش|تكييف|تحكم في الدخول|حساسات تسريب|تحكم من الموبايل"]],
+ ["التكييف والتهوية والتدفئة",["تكييف|سبليت|كونسيلد|مركزي|الاحتفاظ بالأجهزة","تهوية وشفط|حمامات|مطبخ|تجديد هواء","تدفئة|تحت الأرضية|رادياتير"]],
+ ["المطبخ والنجارة الثابتة",["وحدات المطبخ|خشب|ألمنيوم|تجديد الوحدات الحالية","سطح المطبخ|جرانيت|كوارتز|رخام|بورسلين","دواليب ثابتة|دريسنج|دواليب غرف|وحدات تخزين|مكتبة","تجهيز أجهزة مدمجة|فرن|بوتاجاز|غسالة أطباق|شفاط"]],
+ ["الجاردن والروف والواجهات",["تشطيب واجهات|دهان خارجي|حجر|تجاليد","أرضيات خارجية|إنترلوك|حجر|أرضية مانعة للانزلاق","لاندسكيب|زراعة|شبكة ري|إنارة جاردن","تجهيز الروف والتراس|برجولة|جلسة|نقاط مياه وصرف","حمام سباحة وتجهيزاته","بوابات وأسوار"]],
+ ["احتياجات خاصة وتسليم",["سهولة الحركة|مداخل بدون عتبات|أبواب أوسع|تجهيز حمام","تجهيزات مكتب أو محل|قواطيع زجاج|محطات عمل|لافتة|نقاط شبكة","تأثيث وفرش|أثاث متحرك|ستائر|سجاد","تنظيف وتسليم نهائي"]]
+];
+const finishHost=$("finish-groups");
+finishGroups.forEach(([category,items],g)=>{
+  const section=document.createElement("details");
+  section.style.cssText="border-top:1px solid #ded8d0;padding:12px 0";
+  section.innerHTML=`<summary><b>${category}</b></summary>`+items.map((entry,i)=>{
+    const [name,...variants]=entry.split("|"),id="finish-"+g+"-"+i;
+    return `<div class="f"><label for="${id}">${name}</label><select id="${id}" data-status><option value="">من غير إجابة</option><option>مطلوب</option><option>مش مطلوب</option><option>محتاج رأي المهندس</option></select>${variants.length?`<div data-variants hidden><p class="hint">اختار اللي يناسبك، وممكن أكتر من اختيار.</p><div class="opts">${variants.map(v=>`<label class="opt"><input type="checkbox" value="${v}"><span>${v}</span></label>`).join("")}</div></div>`:""}</div>`;
+  }).join("")+`<div class="f"><label>أماكن التنفيذ أو بند تاني في القسم ده<input data-extra placeholder="مثلاً بورسلين للريسبشن وباركيه لغرف النوم" maxlength="300"></label></div>`;
+  finishHost.append(section);
+});
+finishHost.addEventListener("change",event=>{
+  if(!event.target.matches("[data-status]"))return;
+  const box=event.target.parentElement.querySelector("[data-variants]");
+  if(box)box.hidden=event.target.value!=="مطلوب";
+});
+function finishNotes(){
+  return Array.from(finishHost.children,(section,g)=>{
+    const [category,items]=finishGroups[g], answers=[];
+    section.querySelectorAll("[data-status]").forEach((select,i)=>{
+      if(!select.value)return;
+      const choices=select.value==="مطلوب"?[...select.parentElement.querySelectorAll("input:checked")].map(x=>x.value):[];
+      answers.push(items[i].split("|")[0]+" — "+(choices.length?select.value+" ("+choices.join("، ")+")":select.value));
+    });
+    const extra=section.querySelector("[data-extra]").value.trim();
+    if(extra)answers.push("تفاصيل: "+extra);
+    return answers.length?category+"\n"+answers.join("\n"):"";
+  }).filter(Boolean).join("\n\n");
+}
 function data(){ const r={}; ROOMS.forEach(([k])=>r[k]=$("r_"+k).textContent==="—"?null:Number($("r_"+k).textContent));
   return {name:v("name"),phone:digits(v("phone")),services:cv("svc"),unit:rv("unit"),location:v("location"),area:digits(v("area")).replace("٫","."),floors:v("floors"),state:rv("state"),
-    rooms:r.bed==null&&r.master==null?"":String((r.bed||0)+(r.master||0)),baths:r.bath==null?"":String(r.bath),family:v("family"),style:cv("style").join("، "),budget:rv("budget"),deadline:rv("deadline"),scope:v("scope"),priority:rv("priority"),notes:[v("scope")&&("نطاق الشغل: "+v("scope")),rv("priority")&&("الأولوية: "+rv("priority")),v("notes"),v("ref")&&("مراجع: "+v("ref"))].filter(Boolean).join("\n"),
+    rooms:r.bed==null&&r.master==null?"":String((r.bed||0)+(r.master||0)),baths:r.bath==null?"":String(r.bath),family:v("family"),style:cv("style").join("، "),budget:rv("budget"),deadline:rv("deadline"),scope:v("scope"),priority:rv("priority"),notes:[finishNotes(),v("scope")&&("نطاق الشغل: "+v("scope")),rv("priority")&&("الأولوية: "+rv("priority")),v("notes"),v("ref")&&("مراجع: "+v("ref"))].filter(Boolean).join("\n"),
     rooms_list:ROOMS.filter(([k])=>r[k]).map(([k,n])=>`${n}: ${r[k]}`).join(" — ")}; }
 const SV={design:"تصميم ومستندات",turnkey:"تسليم على المفتاح",cost:"إدارة التنفيذ بنسبة",fixed:"إشراف هندسي",unsure:"محتاج استشارة"};
 let lastAnswers="", lastRef="";
