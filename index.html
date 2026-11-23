@@ -44,7 +44,14 @@ function contactFields(){
   add(more,'service','الخدمة المطلوبة','',['تصميم','تسليم مفتاح','إدارة تنفيذ بنسبة','إشراف هندسي','استشارة']);
 }
 let lastPayload='',lastRef='';
-function makeMessage(){
+/* كود الطلب مضغوط (DMR2:طول:كود) عشان الرسالة الكبيرة ما تتقصّش في واتساب، والطول بيكشف لو اتقصّ */
+async function packCode(obj){
+  const bytes=new TextEncoder().encode(JSON.stringify(obj));let out=bytes,tag='DMR1:';
+  if(window.CompressionStream){try{out=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());tag='DMR2:'+out.length+':';}catch{out=bytes;tag='DMR1:';}}
+  let bin='';for(const n of out)bin+=String.fromCharCode(n);
+  return tag+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_');
+}
+async function makeMessage(){
   const digits=s=>String(s||'').replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c)).replace(/[۰-۹]/g,c=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(c)).replace(/٫/g,'.');
   if(!contact.name||digits(contact.phone).replace(/[^0-9]/g,'').length<10){
     const bad=document.getElementById(!contact.name?'client-name':'client-phone');
@@ -64,20 +71,19 @@ function makeMessage(){
   const summary=sections.map(s=>s.category+'\n'+(s.items.map(i=>i.item+' · '+i.answer+(i.choices.length?' · '+i.choices.map(c=>c.value+(c.room?' — '+c.room:'')).join('، '):'')).join('\n')||'للنقاش مع المهندس')).join('\n\n');
   const service={'تصميم':'design','تسليم مفتاح':'turnkey','إدارة تنفيذ بنسبة':'cost','إشراف هندسي':'fixed','استشارة':'unsure'}[contact.service];
   const {extra,condition,...fields}=contact;
-  const payload={...fields,phone:digits(contact.phone),area:digits(contact.area),floors:digits(contact.floors),rooms:digits(contact.rooms),baths:digits(contact.baths),services:service?[service]:[],state:condition||'',unit:state.type,workType:state.work,finishing:sections,scope:[state.work,summary].filter(Boolean).join('\n'),notes:[state.work,summary,extra].filter(Boolean).join('\n')};
+  const payload={...fields,phone:digits(contact.phone),area:digits(contact.area),floors:digits(contact.floors),rooms:digits(contact.rooms),baths:digits(contact.baths),services:service?[service]:[],state:condition||'',unit:state.type,workType:state.work,finishing:sections,extra:extra||''};
   const sig=JSON.stringify(payload);if(sig!==lastPayload){lastPayload=sig;lastRef=crypto.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2);}
   payload.ref=lastRef;
-  const bytes=new TextEncoder().encode(JSON.stringify(payload));let binary='';for(const n of bytes)binary+=String.fromCharCode(n);
-  const code=btoa(binary).replace(/\+/g,'-').replace(/\//g,'_');
-  return ['طلب تشطيب — DOMERA',contact.name+' · '+payload.phone,state.type+' · '+state.work,summary,extra,'كود استيراد الطلب','DMR1:'+code].filter(Boolean).join('\n\n');
+  const code=await packCode(payload);
+  return ['طلب تشطيب — DOMERA',contact.name+' · '+payload.phone,state.type+' · '+state.work,summary,extra,'كود استيراد الطلب',code].filter(Boolean).join('\n\n');
 }
 function transfer(footer){
   if(window.parent!==window && window.name==='domera-local-client' && new URLSearchParams(location.search).get('embedded')==='1' && (location.protocol==='file:' || document.referrer && new URL(document.referrer).origin===location.origin)){
-    footer.append(btn('مراجعة الطلب للاستيراد',()=>{const message=makeMessage();if(message)window.parent.postMessage({kind:'domera.client-brief',message},'*');},'primary'));return;
+    footer.append(btn('مراجعة الطلب للاستيراد',async()=>{const message=await makeMessage();if(message)window.parent.postMessage({kind:'domera.client-brief',message},'*');},'primary'));return;
   }
   const messageBox=el('textarea',card);messageBox.readOnly=true;messageBox.hidden=true;messageBox.setAttribute('aria-label','رسالة الطلب كاملة');
-  footer.append(btn('إرسال على واتساب',()=>{const msg=makeMessage();if(msg){const to=(new URLSearchParams(location.search).get('to')||'').replace(/[^0-9]/g,'');window.open('https://wa.me/'+to+'?text='+encodeURIComponent(msg),'_blank','noopener');}},'primary'));
-  footer.append(btn('انسخ الطلب',async e=>{const msg=makeMessage();if(!msg)return;messageBox.value=msg;try{await navigator.clipboard.writeText(msg);e.target.textContent='تم نسخ الطلب ✓'}catch{messageBox.hidden=false;messageBox.select();e.target.textContent='انسخ الرسالة المحددة'}}));
+  footer.append(btn('إرسال على واتساب',async()=>{const msg=await makeMessage();if(msg){const to=(new URLSearchParams(location.search).get('to')||'').replace(/[^0-9]/g,'');window.open('https://wa.me/'+to+'?text='+encodeURIComponent(msg),'_blank','noopener');}},'primary'));
+  footer.append(btn('انسخ الطلب',async e=>{const msg=await makeMessage();if(!msg)return;messageBox.value=msg;try{await navigator.clipboard.writeText(msg);e.target.textContent='تم نسخ الطلب ✓'}catch{messageBox.hidden=false;messageBox.select();e.target.textContent='انسخ الرسالة المحددة'}}));
 }
 function render(){document.querySelector('nav').innerHTML=steps.map((t,i)=>'<span class="'+(i<=state.page?'on':'')+'">'+t+'</span>').join('');card.replaceChildren();const p=state.page;
 if(!p){el('h1',card,'هنشتغل في إيه؟');el('h2',card,'نوع المكان');options(card,['شقة','فيلا','مكتب / محل','مكان تاني'],'type');el('h2',card,'محتاج مننا إيه؟');options(card,work,'work');
